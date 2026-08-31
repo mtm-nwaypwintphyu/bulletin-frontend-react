@@ -16,7 +16,7 @@ export const authApi = {
   logout: () => api.post("/api/auth/logout"),
 
   register: (registerData: RegisterInput) =>
-    api.post<ApiResponse<{ user: User }>>("/api/auth/register", registerData),
+    api.post<ApiResponse<User>>("/api/auth/register", registerData),
 
   forgot: (email: string) =>
     api.post<ApiResponse<null>>("/api/auth/forgot-password", { email }),
