@@ -90,6 +90,7 @@ export default function Register() {
             label="Name"
             placeholder="Enter your name"
             value={name}
+            type="email"
             className="w-full rounded-lg border border-brand-border px-3 py-2"
             onChange={(e) => {
               setName(e.target.value);
