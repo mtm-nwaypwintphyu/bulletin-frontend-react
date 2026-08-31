@@ -1,9 +1,12 @@
-function App() {
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes/router";
+import { Toaster } from "sonner";
+
+export default function App() {
   return (
     <>
-      <h1>Hello World</h1>
+      <Toaster richColors position="top-right" />
+      <RouterProvider router={router} />
     </>
   );
 }
-
-export default App;
