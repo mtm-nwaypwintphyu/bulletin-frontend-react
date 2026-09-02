@@ -26,4 +26,10 @@ export const authApi = {
       `/api/auth/reset-password?token=${token}`,
       { password },
     ),
+
+  updatePassword: (currentPassword: string, newPassword: string) =>
+    api.post<ApiResponse<null>>("/api/auth/change-password", {
+      currentPassword,
+      newPassword,
+    }),
 };

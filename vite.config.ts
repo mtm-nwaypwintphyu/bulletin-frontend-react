@@ -9,5 +9,11 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    proxy: {
+      "/uploads": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
   },
 });

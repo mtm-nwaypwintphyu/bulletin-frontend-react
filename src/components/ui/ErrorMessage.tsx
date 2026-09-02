@@ -8,7 +8,7 @@ export default function ErrorMessage({ message }: ErrorMessageProps) {
 
   return (
     <div
-      className="mt-1 flex items-center gap-1 text-xs text-red-500"
+      className="mt-1 flex items-center gap-1 text-xs text-brand-red"
       role="alert"
     >
       <ShieldCheck className="h-4 my-2 w-4 flex-shrink-0" />
