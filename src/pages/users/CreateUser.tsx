@@ -1,33 +1,34 @@
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useUserStore } from "../../stores/useUserStore";
+import { saveUserDraft, getUserDraft } from "../../utils/userDraft";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/Button";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 
 export default function CreateUser() {
   const navigate = useNavigate();
-  const { setFormDraft, formDraft } = useUserStore();
+  const existing = getUserDraft();
 
-  const [name, setName] = useState(formDraft?.name || "");
-  const [email, setEmail] = useState(formDraft?.email || "");
-  const [password, setPassword] = useState(formDraft?.password || "");
-  const [phone, setPhone] = useState(formDraft?.phone || "");
-  const [dob, setDob] = useState(formDraft?.dob || "");
-  const [type, setType] = useState(formDraft?.type || "USER");
-  const [address, setAddress] = useState(formDraft?.address || "");
+  const [name, setName] = useState(existing?.name || "");
+  const [email, setEmail] = useState(existing?.email || "");
+  const [password, setPassword] = useState(existing?.password || "");
+  const [phone, setPhone] = useState(existing?.phone || "");
+  const [dob, setDob] = useState(existing?.dob || "");
+  const [type, setType] = useState(existing?.type || "USER");
+  const [address, setAddress] = useState(existing?.address || "");
   const [profile, setProfile] = useState<File | null>(
-    formDraft?.profile || null,
+    existing?.profile || null,
   );
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    formDraft?.previewUrl || null,
+    existing?.previewUrl || null,
   );
 
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
     password?: string;
+    phone?: string;
   }>({});
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,24 +45,43 @@ export default function CreateUser() {
   const handleProceedToConfirm = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
-    const newErrors: { name?: string; email?: string; password?: string } = {};
+    const newErrors: {
+      name?: string;
+      email?: string;
+      password?: string;
+      phone?: string;
+    } = {};
 
     if (!name.trim()) newErrors.name = "Name is required";
     else if (name.trim().length < 2)
       newErrors.name = "Name must be at least 2 characters";
 
-    if (!email.trim()) newErrors.email = "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(email.trim())) {
+      newErrors.email = "Invalid email format";
+    }
 
     if (!password.trim()) newErrors.password = "Password is required";
     else if (password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
+
+    const phoneRegex = /^[0-9]+$/;
+    if (phone.trim() && !phoneRegex.test(phone.trim())) {
+      newErrors.phone = "Phone number must contain only numbers";
+    } else if (phone.trim() && phone.trim().length < 9) {
+      newErrors.phone = "Phone number must be at least 9 digits";
+    } else if (phone.trim() && phone.trim().length > 9) {
+      newErrors.phone = "Phone number must be under 9 digits";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    setFormDraft({
+    saveUserDraft({
       name,
       email,
       password,
@@ -105,7 +125,10 @@ export default function CreateUser() {
           <div className="w-full sm:w-1/2">
             <InputField
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setErrors((prev) => ({ ...prev, name: undefined }));
+              }}
               placeholder="User name"
             />
             {errors.name && <ErrorMessage message={errors.name} />}
@@ -120,7 +143,10 @@ export default function CreateUser() {
             <InputField
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
               placeholder="User email"
             />
             {errors.email && <ErrorMessage message={errors.email} />}
@@ -135,7 +161,10 @@ export default function CreateUser() {
             <InputField
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, password: undefined }));
+              }}
               placeholder="User password"
             />
             {errors.password && <ErrorMessage message={errors.password} />}
@@ -158,10 +187,15 @@ export default function CreateUser() {
           <span className="font-medium text-xs mr-5 w-28">Phone:</span>
           <div className="w-full sm:w-1/2">
             <InputField
+              type="number"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setErrors((prev) => ({ ...prev, phone: undefined }));
+              }}
               placeholder="User phone"
             />
+            {errors.phone && <ErrorMessage message={errors.phone} />}
           </div>
         </div>
 

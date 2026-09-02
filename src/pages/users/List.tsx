@@ -2,7 +2,7 @@ import { useEffect, useState, type SubmitEvent } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { useUserStore } from "../../stores/useUserStore";
+import { useUsers } from "../../hooks/useUsers";
 
 import Button from "../../components/ui/Button";
 import InputField from "../../components/ui/InputField";
@@ -13,14 +13,8 @@ import UserDetailModal from "../../components/common/UserDetailModal";
 import { PAGINATION } from "../../utils/constants";
 
 export default function UserList() {
-  const {
-    users,
-    fetchUsers,
-    deleteUser,
-    getUserById,
-    totalPages = 1,
-    total = 0,
-  } = useUserStore();
+  const { users, totalPages, total, fetchUsers, deleteUser } = useUsers();
+
   const [page, setPage] = useState(1);
   const limit = PAGINATION.DEFAULT_LIMIT;
   const [searchName, setSearchName] = useState("");
@@ -75,7 +69,7 @@ export default function UserList() {
       setShowConfirmModal(false);
       setSelectedUserId(null);
       if (result.success) {
-        toast.success("User deleted successfully!");
+        toast.success(result.message || "User deleted successfully.");
       } else {
         toast.error(result.message || "Failed to delete user.");
       }
@@ -86,7 +80,6 @@ export default function UserList() {
   const showUserDetail = (userId: number) => {
     setSelectedUserId(userId);
     setShowDetailModal(true);
-    getUserById(userId);
   };
 
   const selectedUser = users.find((user) => user.id === selectedUserId);

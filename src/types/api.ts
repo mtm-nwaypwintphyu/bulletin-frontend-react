@@ -46,3 +46,14 @@ export interface UserListResponse {
     totalPages: number;
   };
 }
+export interface FormDraftData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  dob: string;
+  type: string;
+  address: string;
+  profile: File | null;
+  previewUrl: string | null;
+}

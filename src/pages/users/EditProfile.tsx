@@ -3,44 +3,52 @@ import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
 import { User as UserIcon } from "lucide-react";
 
-import { useUserStore } from "../../stores/useUserStore";
+import { useUsers } from "../../hooks/useUsers";
 import { useAuthStore } from "../../stores/useAuthStore";
+import type { User } from "../../types/api";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/Button";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 
 export default function EditProfile() {
   const { currentUser } = useAuthStore();
-  const { user, getUserById, updateUser } = useUserStore();
-  const navigate = useNavigate();
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dob, setDob] = useState("");
-  const [type, setType] = useState("");
-  const [address, setAddress] = useState("");
-  const [profile, setProfile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [removeProfile, setRemoveProfile] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; name?: string }>({});
+  const { user, loading, getUserById } = useUsers();
 
   useEffect(() => {
     if (currentUser?.id) {
       getUserById(currentUser.id);
     }
-  }, [getUserById, currentUser?.id]);
+  }, [currentUser?.id, getUserById]);
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      setDob(user.dob ? user.dob.split("T")[0] : "");
-      setType(user.type || "");
-      setAddress(user.address || "");
-    }
-  }, [user]);
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-brand-text p-8 text-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  return <EditProfileForm user={user} />;
+}
+
+function EditProfileForm({ user }: { user: User }) {
+  const { currentUser } = useAuthStore();
+  const { updateUser } = useUsers();
+  const navigate = useNavigate();
+
+  const [name, setName] = useState(user.name || "");
+  const [email, setEmail] = useState(user.email || "");
+  const [phone, setPhone] = useState(user.phone || "");
+  const [dob, setDob] = useState(user.dob ? user.dob.split("T")[0] : "");
+  const [type, setType] = useState(user.type || "");
+  const [address, setAddress] = useState(user.address || "");
+  const [profile, setProfile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [removeProfile, setRemoveProfile] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; name?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -78,18 +86,27 @@ export default function EditProfile() {
       return;
     }
 
-    if (!currentUser?.id) return;
+    setSubmitting(true);
 
-    const userData: Record<string, string> = { name, email, phone, dob, type, address };
+    const userData: Record<string, string> = {
+      name,
+      email,
+      phone,
+      dob,
+      type,
+      address,
+    };
     if (removeProfile) {
       userData.profile = "";
     }
 
     const result = await updateUser(
-      currentUser.id,
+      user.id,
       userData,
       removeProfile ? null : profile,
     );
+
+    setSubmitting(false);
 
     if (result?.success) {
       toast.success("Profile updated successfully!");
@@ -100,18 +117,16 @@ export default function EditProfile() {
   };
 
   const handleClear = () => {
-    if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      setDob(user.dob ? user.dob.split("T")[0] : "");
-      setType(user.type || "");
-      setAddress(user.address || "");
-      setProfile(null);
-      setPreviewUrl(null);
-      setRemoveProfile(false);
-      setErrors({});
-    }
+    setName(user.name || "");
+    setEmail(user.email || "");
+    setPhone(user.phone || "");
+    setDob(user.dob ? user.dob.split("T")[0] : "");
+    setType(user.type || "");
+    setAddress(user.address || "");
+    setProfile(null);
+    setPreviewUrl(null);
+    setRemoveProfile(false);
+    setErrors({});
   };
 
   return (
@@ -203,7 +218,7 @@ export default function EditProfile() {
             <div className="w-20 h-20 rounded-full bg-brand-accent-bg border border-brand-border flex items-center justify-center overflow-hidden">
               {removeProfile ? (
                 <UserIcon className="size-8 text-brand-text/40" />
-              ) : user?.profile ? (
+              ) : user.profile ? (
                 <img
                   src={user.profile}
                   alt={user.name || "Profile"}
@@ -213,7 +228,7 @@ export default function EditProfile() {
                 <UserIcon className="size-8 text-brand-text/40" />
               )}
             </div>
-            {user?.profile && !removeProfile && !previewUrl && (
+            {user.profile && !removeProfile && !previewUrl && (
               <Button
                 type="button"
                 variant="outline"
@@ -224,7 +239,9 @@ export default function EditProfile() {
               </Button>
             )}
             {removeProfile && (
-              <span className="text-xs text-brand-red">Photo will be removed</span>
+              <span className="text-xs text-brand-red">
+                Photo will be removed
+              </span>
             )}
           </div>
         </div>
@@ -252,15 +269,23 @@ export default function EditProfile() {
         </div>
 
         <div className="flex justify-center gap-3 pt-4 border-t border-brand-border">
-          <Button variant="primary" type="submit" className="px-4 py-2 text-sm">
-            Edit
+          <Button
+            variant="primary"
+            type="submit"
+            className="px-4 py-2 text-sm"
+            disabled={submitting}
+          >
+            {submitting ? "Saving..." : "Edit"}
           </Button>
           <Button variant="outline" type="button" onClick={handleClear}>
             Clear
           </Button>
 
           <div className="flex justify-end w-full">
-            <Link to="/profile/change-password" className="text-s text-brand-accent underline">
+            <Link
+              to="/profile/change-password"
+              className="text-sm text-brand-accent underline"
+            >
               Change Password
             </Link>
           </div>

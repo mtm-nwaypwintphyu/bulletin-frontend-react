@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { authApi } from "../api/auth";
-import { getErrorMessage } from "../utils/storeHelpers";
+import { getErrorMessage } from "../utils/errorHelper";
 import type { User, LoginInput, RegisterInput } from "../types/api";
 
 interface AuthState {

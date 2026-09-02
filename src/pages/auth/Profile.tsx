@@ -1,18 +1,20 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User as UserIcon } from "lucide-react";
-import { useUserStore } from "../../stores/useUserStore";
+import { useUsers } from "../../hooks/useUsers";
 import { useAuthStore } from "../../stores/useAuthStore";
 import Button from "../../components/ui/Button";
 
 export default function Profile() {
   const { currentUser } = useAuthStore();
-  const { user, getUserById } = useUserStore();
+  const { user, getUserById } = useUsers();
   const navigate = useNavigate();
 
   useEffect(() => {
-    getUserById(currentUser?.id ?? 0);
-  }, [getUserById, currentUser?.id]);
+    if (currentUser?.id) {
+      getUserById(currentUser.id);
+    }
+  }, [currentUser?.id, getUserById]);
 
   if (!user) return null;
 

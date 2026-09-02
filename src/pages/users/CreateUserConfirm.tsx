@@ -1,36 +1,39 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useUserStore } from "../../stores/useUserStore";
+import { getUserDraft, clearUserDraft } from "../../utils/userDraft";
+import { useUsers } from "../../hooks/useUsers";
 import Button from "../../components/ui/Button";
 
 export default function ConfirmUser() {
-  const navigate = useNavigate();
-  const { createUser, formDraft, clearFormDraft } = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const { createUser, loading } = useUsers();
 
-  if (!formDraft) {
-    navigate("/create-user");
-    return null;
-  }
+  const navigate = useNavigate();
+  const formDraft = getUserDraft();
+
+  if (!formDraft) return null;
 
   const { name, email, phone, dob, type, address, profile, previewUrl } =
     formDraft;
 
   const handleFinalSubmit = async () => {
-    setLoading(true);
     const result = await createUser(
-      { name, email, password: formDraft.password, phone, dob, type, address },
+      {
+        name,
+        email,
+        password: formDraft.password,
+        phone,
+        dob,
+        type,
+        address,
+      },
       profile,
     );
-    setLoading(false);
-
-    if (result?.success) {
-      clearFormDraft();
-      toast.success("User created successfully!");
-      navigate("/users");
+    if (result.success) {
+      toast.success(result.message || "User created successfully!");
+      navigate("/users", { replace: true });
+      clearUserDraft();
     } else {
-      toast.error(result?.message || "Failed to create user.");
+      toast.error(result.message || "User creation failed!");
     }
   };
 
