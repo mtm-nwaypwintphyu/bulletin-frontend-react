@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
 import { User as UserIcon } from "lucide-react";
 
-import { useUsers } from "../../hooks/useUsers";
+import { useUser } from "../../hooks/useUser";
 import { useAuthStore } from "../../stores/useAuthStore";
 import type { User } from "../../types/api";
 import InputField from "../../components/ui/InputField";
@@ -12,7 +12,7 @@ import ErrorMessage from "../../components/ui/ErrorMessage";
 
 export default function EditProfile() {
   const { currentUser } = useAuthStore();
-  const { user, loading, getUserById } = useUsers();
+  const { user, loading, getUserById } = useUser();
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -35,7 +35,7 @@ export default function EditProfile() {
 
 function EditProfileForm({ user }: { user: User }) {
   const { currentUser } = useAuthStore();
-  const { updateUser } = useUsers();
+  const { updateUser } = useUser();
   const navigate = useNavigate();
 
   const [name, setName] = useState(user.name || "");

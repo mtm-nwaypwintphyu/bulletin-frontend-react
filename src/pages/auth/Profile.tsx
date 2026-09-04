@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User as UserIcon } from "lucide-react";
-import { useUsers } from "../../hooks/useUsers";
+import { useUser } from "../../hooks/useUser";
 import { useAuthStore } from "../../stores/useAuthStore";
 import Button from "../../components/ui/Button";
 
 export default function Profile() {
   const { currentUser } = useAuthStore();
-  const { user, getUserById } = useUsers();
+  const { loading, user, getUserById } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,6 +15,14 @@ export default function Profile() {
       getUserById(currentUser.id);
     }
   }, [currentUser?.id, getUserById]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-brand-text p-8 text-center">
+        Loading...
+      </div>
+    );
+  }
 
   if (!user) return null;
 

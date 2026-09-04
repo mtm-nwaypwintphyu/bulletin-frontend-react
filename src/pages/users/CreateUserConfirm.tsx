@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { getUserDraft, clearUserDraft } from "../../utils/userDraft";
-import { useUsers } from "../../hooks/useUsers";
+import { useUser } from "../../hooks/useUser";
 import Button from "../../components/ui/Button";
 
 export default function ConfirmUser() {
-  const { createUser, loading } = useUsers();
+  const { createUser, loading } = useUser();
 
   const navigate = useNavigate();
   const formDraft = getUserDraft();

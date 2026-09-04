@@ -34,7 +34,7 @@ export default function UserList() {
 
   useEffect(() => {
     fetchUsers({ page, limit });
-  }, [fetchUsers, page, limit]);
+  }, [fetchUsers, page]);
 
   const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
