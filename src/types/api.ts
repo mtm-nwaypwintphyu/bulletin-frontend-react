@@ -9,6 +9,7 @@ export interface User {
   dob?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  password?: string;
 }
 
 export interface ApiResponse<T> {
@@ -30,4 +31,29 @@ export interface RegisterInput {
   phone?: string;
   dob?: string;
   address?: string;
+}
+
+export interface PaginationInput {
+  page: number;
+  limit: number;
+}
+export interface UserListResponse {
+  users: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+export interface FormDraftData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  dob: string;
+  type: string;
+  address: string;
+  profile: File | null;
+  previewUrl: string | null;
 }

@@ -1,9 +1,16 @@
-import { useRouteError, Link } from "react-router-dom";
+import { useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
 
 export default function Error() {
-  const error = useRouteError() as any;
+  const error = useRouteError();
 
-  console.error("Application Error:", error);
+  let message: string;
+  if (isRouteErrorResponse(error)) {
+    message = error.statusText;
+  } else if (error instanceof Error) {
+    message = (error as Error).message;
+  } else {
+    message = "An unexpected error occurred. Please try again or return to safety.";
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-brand-bg px-4 text-center font-sans">
@@ -16,15 +23,13 @@ export default function Error() {
       </h1>
 
       <p className="mt-2 max-w-sm text-sm text-brand-text">
-        {error?.statusText ||
-          error?.message ||
-          "An unexpected error occurred. Please try again or return to safety."}
+        {message}
       </p>
 
       <div className="mt-6 flex items-center gap-3">
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg border border-brand-border bg-white px-4 py-2 text-sm font-medium text-brand-heading transition-colors hover:bg-gray-50"
+          className="rounded-lg border border-brand-border bg-brand-card px-4 py-2 text-sm font-medium text-brand-heading transition-colors hover:bg-brand-accent-bg"
         >
           Reload page
         </button>
