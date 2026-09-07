@@ -17,15 +17,17 @@ export default function UserList() {
 
   const [page, setPage] = useState(1);
   const limit = PAGINATION.DEFAULT_LIMIT;
-  const [searchName, setSearchName] = useState("");
-  const [searchEmail, setSearchEmail] = useState("");
-  const [searchFromDate, setSearchFromDate] = useState("");
-  const [searchToDate, setSearchToDate] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const [localSearchQuery, setLocalSearchQuery] = useState({
+  const [searchInputs, setSearchInputs] = useState({
+    name: "",
+    email: "",
+    fromDate: "",
+    toDate: "",
+  });
+  const [searchFilters, setSearchFilters] = useState({
     name: "",
     email: "",
     fromDate: "",
@@ -38,27 +40,23 @@ export default function UserList() {
 
   const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLocalSearchQuery({
-      name: searchName,
-      email: searchEmail,
-      fromDate: searchFromDate,
-      toDate: searchToDate,
-    });
+    setSearchFilters({ ...searchInputs });
+    setPage(1);
   };
 
   const filteredUsers = users.filter((user) => {
     const matchesName = user.name
       .toLowerCase()
-      .includes(localSearchQuery.name.toLowerCase());
+      .includes(searchFilters.name.toLowerCase());
     const matchesEmail = user.email
       .toLowerCase()
-      .includes(localSearchQuery.email.toLowerCase());
-    const matchesFromDate = localSearchQuery.fromDate
-      ? new Date(user.createdAt ?? "") >= new Date(localSearchQuery.fromDate)
+      .includes(searchFilters.email.toLowerCase());
+    const matchesFromDate = searchFilters.fromDate
+      ? new Date(user.createdAt ?? "") >= new Date(searchFilters.fromDate)
       : true;
 
-    const matchesToDate = localSearchQuery.toDate
-      ? new Date(user.createdAt ?? "") <= new Date(localSearchQuery.toDate)
+    const matchesToDate = searchFilters.toDate
+      ? new Date(user.createdAt ?? "") <= new Date(searchFilters.toDate)
       : true;
     return matchesName && matchesEmail && matchesFromDate && matchesToDate;
   });
@@ -95,32 +93,40 @@ export default function UserList() {
           <div className="flex items-center gap-4 mb-4">
             <span className="font-medium text-xs">Name:</span>
             <InputField
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              value={searchInputs.name}
+              onChange={(e) =>
+                setSearchInputs({ ...searchInputs, name: e.target.value })
+              }
               placeholder="User name"
             />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <span className="font-medium text-xs">Email:</span>
             <InputField
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
+              value={searchInputs.email}
+              onChange={(e) =>
+                setSearchInputs({ ...searchInputs, email: e.target.value })
+              }
               placeholder="User email"
             />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <span className="font-medium text-xs">From :</span>
             <InputField
-              value={searchFromDate}
-              onChange={(e) => setSearchFromDate(e.target.value)}
+              value={searchInputs.fromDate}
+              onChange={(e) =>
+                setSearchInputs({ ...searchInputs, fromDate: e.target.value })
+              }
               type="date"
             />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <span className="font-medium text-xs">To :</span>
             <InputField
-              value={searchToDate}
-              onChange={(e) => setSearchToDate(e.target.value)}
+              value={searchInputs.toDate}
+              onChange={(e) =>
+                setSearchInputs({ ...searchInputs, toDate: e.target.value })
+              }
               type="date"
             />
           </div>

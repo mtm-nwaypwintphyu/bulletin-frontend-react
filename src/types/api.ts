@@ -36,6 +36,7 @@ export interface RegisterInput {
 export interface PaginationInput {
   page: number;
   limit: number;
+  search: string | null;
 }
 export interface UserListResponse {
   users: User[];
@@ -56,4 +57,39 @@ export interface FormDraftData {
   address: string;
   profile: File | null;
   previewUrl: string | null;
+}
+
+// posts
+export interface Post {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  reactionCount: number | 0;
+  createUsername: string;
+  updatedUsername: string;
+  deletedUsername: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface GetPostsParams {
+  page: number;
+  limit: number;
+  search?: string;
+}
+
+export interface CreatePostInput {
+  title: string;
+  description: string;
+  status?: boolean;
+}
+
+export interface PostListResponse {
+  posts: Post[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
