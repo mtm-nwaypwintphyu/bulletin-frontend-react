@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useEffect, useState, useRef, type SubmitEvent } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,12 +21,10 @@ export default function UserList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const [searchInputs, setSearchInputs] = useState({
-    name: "",
-    email: "",
-    fromDate: "",
-    toDate: "",
-  });
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const fromDateRef = useRef<HTMLInputElement>(null);
+  const toDateRef = useRef<HTMLInputElement>(null);
   const [searchFilters, setSearchFilters] = useState({
     name: "",
     email: "",
@@ -40,7 +38,12 @@ export default function UserList() {
 
   const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSearchFilters({ ...searchInputs });
+    setSearchFilters({
+      name: nameRef.current?.value || "",
+      email: emailRef.current?.value || "",
+      fromDate: fromDateRef.current?.value || "",
+      toDate: toDateRef.current?.value || "",
+    });
     setPage(1);
   };
 
@@ -91,44 +94,20 @@ export default function UserList() {
           className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">Name:</span>
-            <InputField
-              value={searchInputs.name}
-              onChange={(e) =>
-                setSearchInputs({ ...searchInputs, name: e.target.value })
-              }
-              placeholder="User name"
-            />
+            <span className="font-medium text-sx">Name:</span>
+            <InputField ref={nameRef} placeholder="User name" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">Email:</span>
-            <InputField
-              value={searchInputs.email}
-              onChange={(e) =>
-                setSearchInputs({ ...searchInputs, email: e.target.value })
-              }
-              placeholder="User email"
-            />
+            <span className="font-medium text-sx">Email:</span>
+            <InputField ref={emailRef} placeholder="User email" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">From :</span>
-            <InputField
-              value={searchInputs.fromDate}
-              onChange={(e) =>
-                setSearchInputs({ ...searchInputs, fromDate: e.target.value })
-              }
-              type="date"
-            />
+            <span className="font-medium text-sx">From Date:</span>
+            <InputField ref={fromDateRef} type="date" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">To :</span>
-            <InputField
-              value={searchInputs.toDate}
-              onChange={(e) =>
-                setSearchInputs({ ...searchInputs, toDate: e.target.value })
-              }
-              type="date"
-            />
+            <span className="font-medium text-sx">To Date:</span>
+            <InputField ref={toDateRef} type="date" />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <Button variant="primary" className="px-4 py-2 text-sm">

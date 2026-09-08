@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePosts } from "../../hooks/usePosts";
 import PostCard from "../../components/ui/PostCard";
 import { toast } from "sonner";
@@ -14,10 +14,9 @@ export default function PostList() {
   const limit = PAGINATION.DEFAULT_LIMIT;
   const navigate = useNavigate();
 
-  const [searchInputs, setSearchInputs] = useState({
-    title: "",
-    description: "",
-  });
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLInputElement>(null);
+
   const [searchFilters, setSearchFilters] = useState({
     title: "",
     description: "",
@@ -30,15 +29,13 @@ export default function PostList() {
     fetchPosts({ page, limit, search: search || undefined });
   }, [fetchPosts, page, limit, searchFilters]);
 
-  const handleSearch = () => {
-    setSearchFilters({ ...searchInputs });
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchFilters({
+      title: titleRef.current?.value || "",
+      description: descriptionRef.current?.value || "",
+    });
     setPage(1);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
   };
 
   const handleDeletePost = async (postId: number) => {
@@ -80,41 +77,33 @@ export default function PostList() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 flex flex-col gap-6">
       <div className="bg-brand-card border border-brand-border rounded-lg p-5 shadow-sm">
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-col sm:flex-row gap-4 items-end"
+        >
           <div className="w-full sm:w-1/3">
             <InputField
               label="Title"
-              value={searchInputs.title}
-              onChange={(e) =>
-                setSearchInputs({ ...searchInputs, title: e.target.value })
-              }
-              onKeyDown={handleKeyDown}
+              ref={titleRef}
               placeholder="Filter by title..."
             />
           </div>
           <div className="w-full sm:w-1/3">
             <InputField
               label="Description"
-              value={searchInputs.description}
-              onChange={(e) =>
-                setSearchInputs({
-                  ...searchInputs,
-                  description: e.target.value,
-                })
-              }
-              onKeyDown={handleKeyDown}
+              ref={descriptionRef}
               placeholder="Filter by description..."
             />
           </div>
           <div className="w-full sm:w-auto flex items-center">
             <Button
-              onClick={handleSearch}
+              type="submit"
               className="px-5 h-10 text-sm w-full sm:w-auto"
             >
               Search
             </Button>
           </div>
-        </div>
+        </form>
       </div>
 
       <div className="flex items-center justify-between">
