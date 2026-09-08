@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useEffect, useState, useRef, type SubmitEvent } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,15 +17,15 @@ export default function UserList() {
 
   const [page, setPage] = useState(1);
   const limit = PAGINATION.DEFAULT_LIMIT;
-  const [searchName, setSearchName] = useState("");
-  const [searchEmail, setSearchEmail] = useState("");
-  const [searchFromDate, setSearchFromDate] = useState("");
-  const [searchToDate, setSearchToDate] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const [localSearchQuery, setLocalSearchQuery] = useState({
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const fromDateRef = useRef<HTMLInputElement>(null);
+  const toDateRef = useRef<HTMLInputElement>(null);
+  const [searchFilters, setSearchFilters] = useState({
     name: "",
     email: "",
     fromDate: "",
@@ -38,27 +38,28 @@ export default function UserList() {
 
   const handleSearch = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLocalSearchQuery({
-      name: searchName,
-      email: searchEmail,
-      fromDate: searchFromDate,
-      toDate: searchToDate,
+    setSearchFilters({
+      name: nameRef.current?.value || "",
+      email: emailRef.current?.value || "",
+      fromDate: fromDateRef.current?.value || "",
+      toDate: toDateRef.current?.value || "",
     });
+    setPage(1);
   };
 
   const filteredUsers = users.filter((user) => {
     const matchesName = user.name
       .toLowerCase()
-      .includes(localSearchQuery.name.toLowerCase());
+      .includes(searchFilters.name.toLowerCase());
     const matchesEmail = user.email
       .toLowerCase()
-      .includes(localSearchQuery.email.toLowerCase());
-    const matchesFromDate = localSearchQuery.fromDate
-      ? new Date(user.createdAt ?? "") >= new Date(localSearchQuery.fromDate)
+      .includes(searchFilters.email.toLowerCase());
+    const matchesFromDate = searchFilters.fromDate
+      ? new Date(user.createdAt ?? "") >= new Date(searchFilters.fromDate)
       : true;
 
-    const matchesToDate = localSearchQuery.toDate
-      ? new Date(user.createdAt ?? "") <= new Date(localSearchQuery.toDate)
+    const matchesToDate = searchFilters.toDate
+      ? new Date(user.createdAt ?? "") <= new Date(searchFilters.toDate)
       : true;
     return matchesName && matchesEmail && matchesFromDate && matchesToDate;
   });
@@ -93,36 +94,20 @@ export default function UserList() {
           className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">Name:</span>
-            <InputField
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-              placeholder="User name"
-            />
+            <span className="font-medium text-sx">Name:</span>
+            <InputField ref={nameRef} placeholder="User name" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">Email:</span>
-            <InputField
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              placeholder="User email"
-            />
+            <span className="font-medium text-sx">Email:</span>
+            <InputField ref={emailRef} placeholder="User email" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">From :</span>
-            <InputField
-              value={searchFromDate}
-              onChange={(e) => setSearchFromDate(e.target.value)}
-              type="date"
-            />
+            <span className="font-medium text-sx">From Date:</span>
+            <InputField ref={fromDateRef} type="date" />
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-medium text-xs">To :</span>
-            <InputField
-              value={searchToDate}
-              onChange={(e) => setSearchToDate(e.target.value)}
-              type="date"
-            />
+            <span className="font-medium text-sx">To Date:</span>
+            <InputField ref={toDateRef} type="date" />
           </div>
           <div className="flex items-center gap-4 mb-4">
             <Button variant="primary" className="px-4 py-2 text-sm">

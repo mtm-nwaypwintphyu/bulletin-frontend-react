@@ -80,11 +80,18 @@ export default function Navbar({
           <ThemeToggle />
 
           <Button
-            onClick={() => navigate("/create-user")}
+            onClick={() => navigate("/users/create")}
             variant="outline"
             className="text-xs py-1.5 px-3 h-8"
           >
             + Create User
+          </Button>
+          <Button
+            onClick={() => navigate("/posts/create")}
+            variant="outline"
+            className="text-xs py-1.5 px-3 h-8"
+          >
+            + Create Post
           </Button>
 
           {user ? (

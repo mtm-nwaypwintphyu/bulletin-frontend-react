@@ -14,7 +14,11 @@ import ChangePassword from "../pages/users/ChangePassword";
 import CreateUser from "../pages/users/CreateUser";
 import CreateUserConfirm from "../pages/users/CreateUserConfirm";
 import PostList from "../pages/posts/List";
+import CreatePost from "../pages/posts/CreatePost";
 import Error from "../pages/common/Error";
+import CreatePostConfirm from "../pages/posts/CreatePostConfirm";
+import EditPage from "../pages/posts/[id]/EditPage";
+import EditConfirmPage from "../pages/posts/[id]/EditConfirmPage";
 
 export const router = createBrowserRouter([
   {
@@ -55,16 +59,32 @@ export const router = createBrowserRouter([
         element: <ChangePassword />,
       },
       {
-        path: "/create-user",
+        path: "/users/create",
         element: <CreateUser />,
       },
       {
-        path: "/create-confirm",
+        path: "/users/create/confirm",
         element: <CreateUserConfirm />,
       },
       {
         path: "/posts",
         element: <PostList />,
+      },
+      {
+        path: "/posts/create",
+        element: <CreatePost />,
+      },
+      {
+        path: "/posts/create/confirm",
+        element: <CreatePostConfirm />,
+      },
+      {
+        path: "/posts/:id/edit",
+        element: <EditPage />,
+      },
+      {
+        path: "/posts/:id/edit/confirm",
+        element: <EditConfirmPage />,
       },
     ],
   },

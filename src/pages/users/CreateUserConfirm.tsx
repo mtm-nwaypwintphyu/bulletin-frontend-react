@@ -43,7 +43,7 @@ export default function ConfirmUser() {
         <h1 className="text-lg font-bold text-brand-heading">
           Confirm User Details
         </h1>
-      </div>
+      </div>    
 
       <div className="p-8 flex flex-col gap-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-brand-accent-bg/40 p-6 rounded-lg border border-brand-border text-sm">
